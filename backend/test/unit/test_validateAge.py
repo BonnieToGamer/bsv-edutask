@@ -21,6 +21,6 @@ def mockedUserController(age: int):
         (121, "invalid")
 ])
 @pytest.mark.unit
-def test_validateAge_Underage(age, result, mockedUserController):
+def test_validateAge(age, result, mockedUserController):
     validationHelper = ValidationHelper(mockedUserController)
     assert validationHelper.validateAge("") == result
