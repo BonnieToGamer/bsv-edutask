@@ -19,10 +19,24 @@ def test_get_user_by_email_valid_email_no_user():
     # arrange
     dao_mock = MagicMock()
     dao_mock.find.return_value = [None]
-
+    
     # act
     user_controller = UserController(dao_mock)
     result = user_controller.get_user_by_email("email@example.com")
 
     # assert
     assert result is None
+    
+    
+@pytest.mark.unit
+def test_get_user_by_email_expection():
+    #Arrange
+    dao_mock = MagicMock()
+    dao_mock.find.side_effect=Exception("DB Failure")
+    
+    #Act  
+    usercontrol = UserController(dao_mock)
+    
+    #Assert 
+    with pytest.raises(Exception):
+        usercontrol.get_user_by_email("email@example.com")
