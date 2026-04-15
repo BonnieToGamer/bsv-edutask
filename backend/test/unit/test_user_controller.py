@@ -40,3 +40,19 @@ def test_get_user_by_email_expection():
     #Assert 
     with pytest.raises(Exception):
         usercontrol.get_user_by_email("email@example.com")
+
+@pytest.mark.unit
+def test_get_user_by_email_valid():
+    # arrange
+    test_user = {"name": "FooBar"}
+    
+    dao_mock = MagicMock()
+    dao_mock.find.return_value = [test_user]
+
+    user_controller = UserController(dao_mock)
+
+    # act
+    result = user_controller.get_user_by_email("email@example.com")
+
+    # assert
+    assert result == test_user
