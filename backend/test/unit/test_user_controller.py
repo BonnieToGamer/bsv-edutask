@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from src.controllers.usercontroller import UserController
 
 @pytest.mark.unit
@@ -60,16 +60,19 @@ def test_get_user_by_email_valid():
 @pytest.mark.unit
 def test_get_user_by_email_valid_multi():
     # arrange
-    test_user = {"name": "FooBar"}
+    test_user1 = {"name": "FooBar"}
+    test_user2 = {"name": "BarFoo"}
     
     dao_mock = MagicMock()
-    dao_mock.find.return_value = [test_user, test_user]
+    dao_mock.find.return_value = [test_user1, test_user2]
 
     user_controller = UserController(dao_mock)
 
     # act
-    result = user_controller.get_user_by_email("email@example.com")
+    with patch("src.controllers.usercontroller.print") as mock_print:
+        result = user_controller.get_user_by_email("email@example.com")
 
-    # assert
-    assert result == test_user
-    
+        # assert
+        mock_print.assert_called_once_with("Error: more than one user found with mail email@example.com")
+        assert result == test_user1
+        
