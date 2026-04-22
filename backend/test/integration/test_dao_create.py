@@ -144,3 +144,17 @@ def test_empty_dict(dao):
     with pytest.raises(WriteError):
         dao.create(new_user)
 
+
+@pytest.mark.integration
+def test_invalid_bson(dao):
+    # arrange
+    new_user = {
+        "firstName": "Mattias",
+        "lastName": "Larsson",
+        "email": "test@example.com",
+        "tasks": ["not-a-valid-objectid"],
+    }
+
+    # act & assert
+    with pytest.raises(WriteError):
+        dao.create(new_user)
