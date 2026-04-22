@@ -104,3 +104,18 @@ def test_wrong_type(dao):
     # act & assert
     with pytest.raises(WriteError):
         dao.create(new_user)
+        
+@pytest.mark.integration
+def test_extra_field(dao):
+    # arrange
+    new_user = {
+        "firstName": "Mattias",
+        "lastName": "Larsson",
+        "email": "mattias.larsson@example.com",
+        "hacked": True
+    }
+    
+    
+    # act & assert
+    with pytest.raises(WriteError):
+        dao.create(new_user)
