@@ -91,3 +91,16 @@ def test_missing_fields_doc(dao):
     # act & assert
     with pytest.raises(WriteError):
         dao.create(new_user)
+
+@pytest.mark.integration
+def test_wrong_type(dao):
+    # arrange
+    new_user = {
+        "firstName": True,
+        "lastName": 10.0,
+        "email": ["testing@example.com"]
+    }
+    
+    # act & assert
+    with pytest.raises(WriteError):
+        dao.create(new_user)
