@@ -133,3 +133,14 @@ def test_unique_field(dao):
     # assert
     with pytest.raises(WriteError):
         dao.create(new_user)
+
+
+@pytest.mark.integration
+def test_empty_dict(dao):
+    # arrange
+    new_user = {}
+
+    # act & assert
+    with pytest.raises(WriteError):
+        dao.create(new_user)
+
