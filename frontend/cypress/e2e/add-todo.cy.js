@@ -7,7 +7,7 @@ describe('Adding todo item', () => {
   const title = "Testing title"
   const url = "nzDuj42HJ1o"
 
-  before(function () {
+  beforeEach(function () {
     // create a fabricated user from a fixture
     cy.fixture('user.json')
       .then((user) => {
@@ -20,60 +20,47 @@ describe('Adding todo item', () => {
           uid = response.body._id.$oid
           name = user.firstName + ' ' + user.lastName
           email = user.email
+
+          // enter the main main page
+          cy.visit('http://localhost:3000')
+
+          // detect a div which contains "Email Address", find the input and type (in a declarative way)
+          cy.contains('div', 'Email Address')
+            .find('input[type=text]')
+            .type(email)
+
+          // submit the form on this page
+          cy.get('form')
+            .submit()
+
+          cy.get('#title').type(title)
+          cy.get('#url').type(url)
+          cy.get('form.submit-form').submit()
+          cy.get('.container-element').first().click()
         })
       })
   })
 
-  beforeEach(function () {
-    // enter the main main page
-    cy.visit('http://localhost:3000')
-
-    // detect a div which contains "Email Address", find the input and type (in a declarative way)
-    cy.contains('div', 'Email Address')
-      .find('input[type=text]')
-      .type(email)
-    // alternative, imperative way of detecting that input field
-    //cy.get('.inputwrapper #email')
-    //    .type(email)
-
-    // submit the form on this page
-    cy.get('form')
-      .submit()
-
-    cy.get('#title').type(title)
-    cy.get('#url').type(url)
-    cy.get('form.submit-form').submit()
-    cy.get('.container-element').first().click()
-  })
-
   it('user writes no text in todo description box', () => {
-    cy.get('ul.todo-list > li.todo-item')
-      .then($items => {
-        const initialCount = $items.length;
+      cy.get('form.inline-form').submit();
 
-        cy.get('form.inline-form').submit();
-        cy.wait(200)
-
-        cy.get('ul.todo-list > li.todo-item')
-          .should('have.length', initialCount);
-      });
+      cy.wait(200)
+      
+      cy.get('ul.todo-list > li.todo-item')
+        .should('have.length', 1);
   })
 
+  it('user writes text in todo description box', () => {
+      cy.get('.inline-form > [type="text"]').type("Hello world!")
+      cy.get('form.inline-form').submit();
 
+      cy.wait(200)
 
-  after(function () {
-    // clean up todo items
-    cy.get('ul.todo-list > li.todo-item')
-      .then($items => {
-        const initialCount = $items.length;
+      cy.get('ul.todo-list > li.todo-item')
+        .should('have.length', 2);
+  })
 
-        cy.get('form.inline-form').submit();
-        cy.wait(200)
-
-        cy.get('ul.todo-list > li.todo-item')
-          .should('have.length', initialCount);
-      });
-    
+  afterEach(function () {
     // clean up by deleting the user from the database
     cy.request({
       method: 'DELETE',
