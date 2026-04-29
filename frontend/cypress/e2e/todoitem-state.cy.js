@@ -33,19 +33,21 @@ describe('Adding todo item', () => {
           cy.get('form')
             .submit()
 
+          cy.intercept('POST', '/tasks/create').as('createTask');
+          cy.intercept('GET', '/tasks/byid/*').as('tasksById');
+          
           cy.get('#title').type(title)
           cy.get('#url').type(url)
           cy.get('form.submit-form').submit()
-          cy.get('.container-element').first().click()
+          cy.wait('@createTask')
         
-          cy.intercept('POST', '/todos/create').as('createTodo');
-          cy.intercept('GET', '/tasks/ofuser/*').as('getTasks');
-          cy.intercept('GET', '/tasks/byid/*').as('tasksById');
+          cy.get('.container-element > a').first().should('be.visible').click()
+          cy.wait('@tasksById')
 
           cy.get('.inline-form > [type="text"]').type("Hello world!")
           cy.get('form.inline-form').submit();
 
-          cy.wait(['@createTodo', '@getTasks', '@tasksById'])
+          cy.wait('@tasksById')
         })
       })
   })
@@ -60,8 +62,8 @@ describe('Adding todo item', () => {
     firstItem.click()
 
     // wait for update
-    cy.wait(['@tasksById'])
-    
+    cy.wait('@tasksById')
+
     firstItem.click().should('have.class','unchecked');
   })
 

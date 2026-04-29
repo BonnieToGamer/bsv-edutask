@@ -7,7 +7,7 @@ describe('Adding todo item', () => {
   const title = "Testing title"
   const url = "nzDuj42HJ1o"
 
-  beforeEach(function () {
+  beforeEach(function () {    
     // create a fabricated user from a fixture
     cy.fixture('user.json')
       .then((user) => {
@@ -33,14 +33,16 @@ describe('Adding todo item', () => {
           cy.get('form')
             .submit()
 
+          cy.intercept('POST', '/tasks/create').as('createTask');
+          cy.intercept('GET', '/tasks/byid/*').as('tasksById');
+          
           cy.get('#title').type(title)
           cy.get('#url').type(url)
           cy.get('form.submit-form').submit()
-          cy.get('.container-element').first().click()
-
-          cy.intercept('POST', '/todos/create').as('createTodo');
-          cy.intercept('GET', '/tasks/ofuser/*').as('getTasks');
-          cy.intercept('GET', '/tasks/byid/*').as('tasksById');
+          cy.wait('@createTask')
+        
+          cy.get('.container-element > a').first().should('be.visible').click()
+          cy.wait('@tasksById')
         })
       })
   })
@@ -48,7 +50,7 @@ describe('Adding todo item', () => {
   it('user writes no text in todo description box', () => {
     cy.get('form.inline-form').submit();
 
-    cy.wait(['@createTodo', '@getTasks', '@tasksById'])
+    cy.wait('@tasksById')
     
     cy.get('ul.todo-list > li.todo-item')
       .should('have.length', 1);
@@ -58,7 +60,7 @@ describe('Adding todo item', () => {
     cy.get('.inline-form > [type="text"]').type("Hello world!")
     cy.get('form.inline-form').submit();
 
-    cy.wait(['@createTodo', '@getTasks', '@tasksById'])
+    cy.wait('@tasksById')
 
     cy.get('ul.todo-list > li.todo-item')
       .should('have.length', 2);

@@ -14,4 +14,6 @@ module.exports = defineConfig({
       bundler: "webpack",
     },
   },
+
+  video: true
 });
