@@ -42,22 +42,29 @@ describe('Adding todo item', () => {
   })
 
   it('user writes no text in todo description box', () => {
-      cy.get('form.inline-form').submit();
+    cy.intercept('POST', '/todos/create').as('createTodo');
+    cy.intercept('GET', '/tasks/ofuser/*').as('getTasks');
+    cy.intercept('GET', '/tasks/byid/*').as('tasksById');
+    cy.get('form.inline-form').submit();
 
-      cy.wait(200)
-      
-      cy.get('ul.todo-list > li.todo-item')
-        .should('have.length', 1);
+    cy.wait(['@createTodo', '@getTasks', '@tasksById'])
+    
+    cy.get('ul.todo-list > li.todo-item')
+      .should('have.length', 1);
   })
 
   it('user writes text in todo description box', () => {
-      cy.get('.inline-form > [type="text"]').type("Hello world!")
-      cy.get('form.inline-form').submit();
+    cy.intercept('POST', '/todos/create').as('createTodo');
+    cy.intercept('GET', '/tasks/ofuser/*').as('getTasks');
+    cy.intercept('GET', '/tasks/byid/*').as('tasksById');
+    
+    cy.get('.inline-form > [type="text"]').type("Hello world!")
+    cy.get('form.inline-form').submit();
 
-      cy.wait(200)
+    cy.wait(['@createTodo', '@getTasks', '@tasksById'])
 
-      cy.get('ul.todo-list > li.todo-item')
-        .should('have.length', 2);
+    cy.get('ul.todo-list > li.todo-item')
+      .should('have.length', 2);
   })
 
   afterEach(function () {
