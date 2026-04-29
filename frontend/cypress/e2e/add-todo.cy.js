@@ -37,14 +37,15 @@ describe('Adding todo item', () => {
           cy.get('#url').type(url)
           cy.get('form.submit-form').submit()
           cy.get('.container-element').first().click()
+
+          cy.intercept('POST', '/todos/create').as('createTodo');
+          cy.intercept('GET', '/tasks/ofuser/*').as('getTasks');
+          cy.intercept('GET', '/tasks/byid/*').as('tasksById');
         })
       })
   })
 
   it('user writes no text in todo description box', () => {
-    cy.intercept('POST', '/todos/create').as('createTodo');
-    cy.intercept('GET', '/tasks/ofuser/*').as('getTasks');
-    cy.intercept('GET', '/tasks/byid/*').as('tasksById');
     cy.get('form.inline-form').submit();
 
     cy.wait(['@createTodo', '@getTasks', '@tasksById'])
@@ -53,11 +54,7 @@ describe('Adding todo item', () => {
       .should('have.length', 1);
   })
 
-  it('user writes text in todo description box', () => {
-    cy.intercept('POST', '/todos/create').as('createTodo');
-    cy.intercept('GET', '/tasks/ofuser/*').as('getTasks');
-    cy.intercept('GET', '/tasks/byid/*').as('tasksById');
-    
+  it('user writes text in todo description box', () => {    
     cy.get('.inline-form > [type="text"]').type("Hello world!")
     cy.get('form.inline-form').submit();
 
