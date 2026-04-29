@@ -46,15 +46,23 @@ describe('Adding todo item', () => {
           cy.get('form.inline-form').submit();
 
           cy.wait(['@createTodo', '@getTasks', '@tasksById'])
-
-          
         })
       })
   })
 
   it('set todoitem to done', () => {
     cy.get('.todo-list > :nth-child(1)').find('.checker').click().should('have.class','checked');
+  })
 
+  it('set todoitem to not done', () => {
+    const firstItem = cy.get('.todo-list > :nth-child(1)').find('.checker');
+    
+    firstItem.click()
+
+    // wait for update
+    cy.wait(['@tasksById'])
+    
+    firstItem.click().should('have.class','unchecked');
   })
 
   afterEach(function () {
