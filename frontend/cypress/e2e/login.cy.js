@@ -3,9 +3,9 @@ describe('Logging into the system', () => {
   let uid // user id
   let name // name of the user (firstName + ' ' + lastName)
   let email // email of the user
-
   before(function () {
     // create a fabricated user from a fixture
+    
     cy.fixture('user.json')
       .then((user) => {
         cy.request({

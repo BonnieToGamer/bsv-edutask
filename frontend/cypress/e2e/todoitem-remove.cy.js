@@ -3,12 +3,14 @@ describe('Adding todo item', () => {
   let uid // user id
   let name // name of the user (firstName + ' ' + lastName)
   let email // email of the user
-
-  const title = "Testing title"
-  const url = "nzDuj42HJ1o"
+  let task
 
   beforeEach(function () {
     // create a fabricated user from a fixture
+    cy.fixture('task.json').then((taskData) => {
+      task = taskData
+    })
+
     cy.fixture('user.json')
       .then((user) => {
         cy.request({
@@ -36,8 +38,8 @@ describe('Adding todo item', () => {
           cy.intercept('POST', '/tasks/create').as('createTask');
           cy.intercept('GET', '/tasks/byid/*').as('tasksById');
           
-          cy.get('#title').type(title)
-          cy.get('#url').type(url)
+          cy.get('#title').type(task.title)
+          cy.get('#url').type(task.url)
           cy.get('form.submit-form').submit()
           cy.wait('@createTask')
         
